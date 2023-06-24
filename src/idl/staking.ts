@@ -1,0 +1,463 @@
+export type Staking = {
+  version: "0.1.0";
+  name: "staking";
+  instructions: [
+    {
+      name: "createPoll";
+      accounts: [
+        {
+          name: "pollAccount";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "user";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "rent";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [
+        {
+          name: "pollId";
+          type: "publicKey";
+        },
+        {
+          name: "votingDeadline";
+          type: "u32";
+        },
+        {
+          name: "maxOptions";
+          type: "u8";
+        }
+      ];
+    },
+    {
+      name: "createVote";
+      accounts: [
+        {
+          name: "pollAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "voteAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "user";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "rent";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [
+        {
+          name: "vote";
+          type: "string";
+        },
+        {
+          name: "tokensStaked";
+          type: "u64";
+        }
+      ];
+    },
+    {
+      name: "updateVote";
+      accounts: [
+        {
+          name: "pollAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "voteAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "user";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "rent";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [
+        {
+          name: "vote";
+          type: "string";
+        },
+        {
+          name: "tokensStaked";
+          type: "u64";
+        }
+      ];
+    }
+  ];
+  accounts: [
+    {
+      name: "individualVote";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "pollId";
+            type: "publicKey";
+          },
+          {
+            name: "voterId";
+            type: "publicKey";
+          },
+          {
+            name: "vote";
+            type: "string";
+          },
+          {
+            name: "tokensStaked";
+            type: "u64";
+          },
+          {
+            name: "bump";
+            type: "u8";
+          }
+        ];
+      };
+    },
+    {
+      name: "pollInfo";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "pollId";
+            type: "publicKey";
+          },
+          {
+            name: "status";
+            type: {
+              defined: "PollStatus";
+            };
+          },
+          {
+            name: "votingDeadline";
+            type: "u32";
+          },
+          {
+            name: "maxOptions";
+            type: "u8";
+          },
+          {
+            name: "user";
+            type: "publicKey";
+          }
+        ];
+      };
+    }
+  ];
+  types: [
+    {
+      name: "PollStatus";
+      type: {
+        kind: "enum";
+        variants: [
+          {
+            name: "Started";
+          },
+          {
+            name: "Finished";
+          },
+          {
+            name: "Cancelled";
+          }
+        ];
+      };
+    }
+  ];
+  errors: [
+    {
+      code: 6000;
+      name: "CannotGetBump";
+      msg: "Cannot get bump";
+    },
+    {
+      code: 6001;
+      name: "PollAlreadyFinished";
+      msg: "Poll already finished";
+    },
+    {
+      code: 6002;
+      name: "PollAlreadyCancelled";
+      msg: "Poll already cancelled";
+    },
+    {
+      code: 6003;
+      name: "VoteTooLong";
+      msg: "Vote too long";
+    },
+    {
+      code: 6004;
+      name: "PollNotActive";
+      msg: "Poll not active";
+    }
+  ];
+};
+
+export const IDL: Staking = {
+  version: "0.1.0",
+  name: "staking",
+  instructions: [
+    {
+      name: "createPoll",
+      accounts: [
+        {
+          name: "pollAccount",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "user",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "rent",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "pollId",
+          type: "publicKey",
+        },
+        {
+          name: "votingDeadline",
+          type: "u32",
+        },
+        {
+          name: "maxOptions",
+          type: "u8",
+        },
+      ],
+    },
+    {
+      name: "createVote",
+      accounts: [
+        {
+          name: "pollAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "voteAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "user",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "rent",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "vote",
+          type: "string",
+        },
+        {
+          name: "tokensStaked",
+          type: "u64",
+        },
+      ],
+    },
+    {
+      name: "updateVote",
+      accounts: [
+        {
+          name: "pollAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "voteAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "user",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "rent",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "vote",
+          type: "string",
+        },
+        {
+          name: "tokensStaked",
+          type: "u64",
+        },
+      ],
+    },
+  ],
+  accounts: [
+    {
+      name: "individualVote",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "pollId",
+            type: "publicKey",
+          },
+          {
+            name: "voterId",
+            type: "publicKey",
+          },
+          {
+            name: "vote",
+            type: "string",
+          },
+          {
+            name: "tokensStaked",
+            type: "u64",
+          },
+          {
+            name: "bump",
+            type: "u8",
+          },
+        ],
+      },
+    },
+    {
+      name: "pollInfo",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "pollId",
+            type: "publicKey",
+          },
+          {
+            name: "status",
+            type: {
+              defined: "PollStatus",
+            },
+          },
+          {
+            name: "votingDeadline",
+            type: "u32",
+          },
+          {
+            name: "maxOptions",
+            type: "u8",
+          },
+          {
+            name: "user",
+            type: "publicKey",
+          },
+        ],
+      },
+    },
+  ],
+  types: [
+    {
+      name: "PollStatus",
+      type: {
+        kind: "enum",
+        variants: [
+          {
+            name: "Started",
+          },
+          {
+            name: "Finished",
+          },
+          {
+            name: "Cancelled",
+          },
+        ],
+      },
+    },
+  ],
+  errors: [
+    {
+      code: 6000,
+      name: "CannotGetBump",
+      msg: "Cannot get bump",
+    },
+    {
+      code: 6001,
+      name: "PollAlreadyFinished",
+      msg: "Poll already finished",
+    },
+    {
+      code: 6002,
+      name: "PollAlreadyCancelled",
+      msg: "Poll already cancelled",
+    },
+    {
+      code: 6003,
+      name: "VoteTooLong",
+      msg: "Vote too long",
+    },
+    {
+      code: 6004,
+      name: "PollNotActive",
+      msg: "Poll not active",
+    },
+  ],
+};

@@ -1,0 +1,25 @@
+{
+  "short_name": "W3bber",
+  "name": "Rate, Stake and Earn!",
+  "icons": [
+    {
+      "src": "w3bber_logo_copy.png",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "w3bber_logo_copy.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "w3bber_logo_copy.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
