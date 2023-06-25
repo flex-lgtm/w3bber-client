@@ -4,34 +4,23 @@ import { LoginInput } from "../models/LoginInput";
 import { LoginDetails } from "../models/LoginDetails";
 import qs from "qs";
 import { VoteModel } from "../models/VoteModel";
+import { SignupInput } from "../models/SignupInput";
 
-const BASEURL =
-  "http://consensusbackend-env.eba-8agh6pkr.us-east-1.elasticbeanstalk.com/v1";
+const BASEURL = "https://consensusbackend.w3bber.com/v1";
 
-export const signup = async (loginInput: LoginInput) => {
-  const api_call: string = `${BASEURL}/login_or_create?wallet_id=${loginInput.username}`;
+export const signup = async (signupInput: SignupInput) => {
+  const api_call: string = `${BASEURL}/register`;
   const config = {
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      "Content-Type": "application/json",
       accept: "application/json",
     },
   };
-  return axios.post<LoginDetails>(api_call, qs.stringify(loginInput), config);
+  return axios.post<LoginDetails>(api_call, signupInput, config);
 };
 
 export const login = async (loginInput: LoginInput) => {
   const api_call: string = `${BASEURL}/login?wallet_id=${loginInput.username}`;
-  const config = {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      accept: "application/json",
-    },
-  };
-  return axios.post<LoginDetails>(api_call, qs.stringify(loginInput), config);
-};
-
-export const loginOrCreate = async (loginInput: LoginInput) => {
-  const api_call: string = `${BASEURL}/login_or_create?wallet_id=${loginInput.username}`;
   const config = {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -107,11 +96,10 @@ export const getPollOptionsMetadata = async (bearerToken: string) => {
   return axios.post(api_call, {}, config);
 };
 
-export const getAllPolls = async (bearerToken: string) => {
+export const getAllPolls = async () => {
   const api_call: string = `${BASEURL}/consensus-polls/get_all_polls`;
   const config = {
     headers: {
-      Authorization: `Bearer ${bearerToken}`,
       accept: "application/json",
     },
   };

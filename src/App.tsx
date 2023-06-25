@@ -114,12 +114,9 @@ const Content: FC = () => {
   const [globalUsername, setGlobalUsername] = useState("");
   const [polls, setPolls] = useState<PollModel[]>();
 
-  // Method to get all polls from the database
-  useEffect(() => {
-    if (bearer === "") {
-      return;
-    }
-    getAllPolls(bearer)
+  // Get polls from API if not already loaded
+  if (polls === undefined || polls.length === 0) {
+    getAllPolls()
       .then((response: any) => {
         const pollsFromApi = response.data.data;
         const updatedPolls = pollsFromApi.map((x: Object) => {
@@ -131,8 +128,8 @@ const Content: FC = () => {
       .catch((err: any) => {
         console.error(err);
       });
-  }, [bearer]);
-
+  }
+  
   return (
     <div className="App">
       <ToastContainer

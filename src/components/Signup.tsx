@@ -21,9 +21,9 @@ import {
   m_SectionHeadingColor,
 } from "../Constants";
 import { toast } from "react-toastify";
-import { LoginInput } from "../models/LoginInput";
 import { signup } from "../api/api";
 import { useState } from "react";
+import { SignupInput } from "../models/SignupInput";
 
 export const SignupForm = () => {
   const [username, setUsername] = useState("");
@@ -62,11 +62,11 @@ export const SignupForm = () => {
       <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
         <Stack align={"center"}>
           <Heading color={m_SectionHeadingColor} fontSize={"4xl"}>
-            Sign Up
+            Sign Up for an Account
           </Heading>
-          <Text fontSize={"lg"} color={m_NormalTextColor}>
+          {/* <Text fontSize={"lg"} color={m_NormalTextColor}>
             to create <Link color={"purple.400"}>Polls</Link> ✌️
-          </Text>
+          </Text> */}
         </Stack>
         <Box rounded={"lg"} bg={m_CardBgColor} boxShadow={"lg"} p={8}>
           <Stack spacing={4}>
@@ -107,28 +107,29 @@ export const SignupForm = () => {
                 </Text>
               </Stack>
               <Button
-                // mt={4}
                 bg={"purple.400"}
                 color={"white"}
                 _hover={{
                   bg: "purple.500",
                 }}
                 onClick={() => {
-                  const loginInput: LoginInput = {
+                  const signupInput: SignupInput = {
                     username: username,
                     password: password,
+                    wallet_id: username,
+                    register_type: "wallet",
                   };
 
-                  signup(loginInput)
+                  signup(signupInput)
                     .then((response: any) => {
                       console.log("signup: ", response);
                       if (response.data == null) {
                         notifyFailure("Signup Failed: " + response);
-                      } else if (response.data.internalResponseCode == 1) {
+                      } else if (response.data.internal_response_code == 1) {
                         notifyFailure(
                           "Signup Failed: " + response.data.details
                         );
-                      } else if (response.data.internalResponseCode == 0) {
+                      } else if (response.data.internal_response_code == 0) {
                         notifySuccess("Signup Successful, please Login");
                         navigate("/login", { replace: true });
                       }

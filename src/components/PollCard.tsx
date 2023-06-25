@@ -3,23 +3,9 @@ import * as anchor from "@project-serum/anchor";
 import {
   chakra,
   Card,
-  CardHeader,
-  CardBody,
   CardFooter,
-  Heading,
   Text,
   Button,
-  Image,
-  Box,
-  Progress,
-  Stack,
-  Editable,
-  EditablePreview,
-  EditableInput,
-  useDisclosure,
-  useTimeout,
-  Badge,
-  Flex,
   Center,
   Select,
   FormControl,
@@ -40,12 +26,8 @@ import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import {
   m_CardBgColor,
   m_CardHeadingColor,
-  m_NormalTextColor,
   m_SectionHeadingColor,
 } from "../Constants";
-import Countdown from "react-countdown";
-import { AiOutlineArrowRight, AiOutlineCheckCircle } from "react-icons/ai";
-import { BsPatchCheck } from "react-icons/bs";
 import { PollModel } from "../models/PollModel";
 import {
   createVoteOnChain,
@@ -54,28 +36,8 @@ import {
 } from "../api/solana_api";
 import { encryptRSA } from "../encryption/encryption";
 import NodeRSA from "node-rsa";
-import * as bs58 from "bs58";
 import { InfoIcon } from "@chakra-ui/icons";
 import { AnchorWallet } from "@solana/wallet-adapter-react";
-
-const countdownRenderer = ({
-  hours,
-  minutes,
-  seconds,
-  completed,
-}: {
-  hours: number;
-  minutes: number;
-  seconds: number;
-  completed: boolean;
-}) => {
-  return (
-    <Text color={m_SectionHeadingColor}>
-      Resets in: {hours}h {minutes}m {seconds}s
-    </Text>
-  );
-  // }
-};
 
 const TextWithTooltip = ({ text, tooltipText }: any) => {
   return (
@@ -137,19 +99,7 @@ const PollCard = ({
     });
   };
 
-  const {
-    isOpen: isOpenBallot,
-    onOpen: onOpenBallot,
-    onClose: onCloseBallot,
-  } = useDisclosure();
-  const {
-    isOpen: isOpenStake,
-    onOpen: onOpenStake,
-    onClose: onCloseStake,
-  } = useDisclosure();
-
   useEffect(() => {
-    // const getExistingVote = (poll: PollModel) => {
     if (anchorProgram === undefined || anchorWallet === undefined) {
       return;
     }
@@ -162,13 +112,10 @@ const PollCard = ({
 
     setVoteAccount(individualVotePDA.toBase58());
 
-    // getVoteFromChain(anchorProgram, anchorWallet, pollPublicKey)
     anchorProgram.account.individualVote
       .fetch(individualVotePDA)
       .then((response: any) => {
         console.log(poll.poll_id, response);
-        // console.log(response.vote);
-        // console.log(response.tokensStaked.toNumber());
         setOnChainVote(response.vote);
         setOnChainStake(response.tokensStaked.toNumber() / LAMPORTS_PER_SOL);
         console.log(onChainVote);
@@ -177,25 +124,11 @@ const PollCard = ({
       .catch((err: any) => {
         console.error(err);
       });
-    // if (userVotes === undefined) {
-    //   const x: UserVote[] = [];
-    //   return x;
-    // }
-    // return userVotes!.filter((x) => x.poll_id === poll.poll_id);
-    // };
   }, [anchorProgram, anchorWallet, poll.poll_id]);
 
   const [randomizedVote, setRandomizedVote] = useState<number>();
   const [encryptedVote, setEncryptedVote] = useState<string>("");
   const [stakingAmount, setStakingAmount] = useState<number>(0);
-
-  // const getExistingStake = () => {
-  //   if (userStakes === undefined) {
-  //     const x: StakeState[] = [];
-  //     return x;
-  //   }
-  //   return userStakes!.filter((x) => x.poll_id === poll.poll_id);
-  // };
 
   function randomIntFromInterval(min: number, max: number) {
     // min and max included
@@ -211,9 +144,6 @@ const PollCard = ({
 
   const getEncryptedVote = (randomizedVote: number) => {
     const message = randomizedVote.toString();
-    console.log(message);
-    // const key = new NodeRSA();
-    // key.importKey(poll.public_key, "pkcs8-public");
     const encryptedMessage = encryptRSA(
       message,
       poll.public_key as unknown as NodeRSA.Key
@@ -234,22 +164,11 @@ const PollCard = ({
 
     const rv = getRandomizedVote(value);
     const ev = getEncryptedVote(rv);
-    // console.log(value);
-    // if (value === undefined) {
-    //   return;
-    // }
     setRandomizedVote(rv);
     setEncryptedVote(ev);
   };
 
-  // Encrypt a message
-  // const message = "Hello, RSA encryption!";
-  // console.log("Encrypted message:", encryptedMessage);
-  // console.log(encryptedMessage.length);
-  // console.log(poll.public_key);
   const pollPublickey = new anchor.web3.PublicKey(poll.poll_id);
-
-  const invalidBearerToken = "Invalid Bearer Token";
   const invalidAnchorProgram = "Invalid Anchor Program";
   const invalidAnchorWallet = "Connect your wallet first";
 
@@ -269,7 +188,6 @@ const PollCard = ({
         verticalAlign={"center"}
         fontWeight="bold"
         lineHeight="1.2"
-        // height={"3em"}
         my={2}
         py={4}
       >
@@ -325,22 +243,6 @@ const PollCard = ({
               <NumberDecrementStepper />
             </NumberInputStepper>
           </NumberInput>
-          {/* <NumberInput
-            size="md"
-            color={m_SectionHeadingColor}
-            precision={3}
-            step={0.001}
-            // maxW={24}
-            defaultValue={0.001}
-            min={0}
-            value={stakingAmount}
-            onChange={(x) => setStakingAmount(Number.parseFloat(x))}
-            // onChange={(valueAsString, valueAsNumber) =>
-            //   setMaxOptions(valueAsNumber)
-            // }
-          >
-            <NumberInputField />
-          </NumberInput> */}
         </FormControl>
 
         <FormControl id="max_options">
@@ -449,10 +351,6 @@ const PollCard = ({
             colorScheme="purple"
             isDisabled={onChainVote !== "" || onChainStake !== 0}
             onClick={() => {
-              // if (anchorProgram === undefined || anchorWallet === undefined) {
-              //   notifyFailure(invali);
-              //   return;
-              // }
               if (anchorWallet === undefined) {
                 notifyFailure(invalidAnchorWallet);
                 return;
@@ -471,7 +369,6 @@ const PollCard = ({
                 stakingAmount
               )
                 .then((response: any) => {
-                  // const data = response.data.data;
                   console.log(response);
                   setOnChainVote(encryptedVote);
                   setOnChainStake(stakingAmount + onChainStake);
@@ -514,7 +411,6 @@ const PollCard = ({
                   console.log(response);
                   setOnChainVote(encryptedVote);
                   setOnChainStake(stakingAmount + onChainStake);
-                  // alert(response);
                   notifySuccess("Updated successfully: " + response);
                 })
                 .catch((err: any) => {
