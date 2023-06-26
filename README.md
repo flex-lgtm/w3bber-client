@@ -29,9 +29,10 @@ This repo shows how you can create and manage polls through W3bber smart contrac
 ## Running Locally
 
 In the project directory, you can run:
+### `yarn install`
+Installs all the dependencies
 
 ### `yarn start`
-
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
