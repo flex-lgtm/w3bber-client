@@ -17,7 +17,9 @@
   <a href="#running-locally">Running Locally</a> •
   <a href="#how-to-use">How To Use</a> •
   <a href="#how-it-works">How it Works</a> •
-  <a href="#reward-calculation">Reward Calculation</a>
+  <a href="#integration">Integration</a> •
+  <a href="#reward-calculation">Reward Calculation</a> •
+  <a href="#important-links">Important Links</a> •
 </p>
 
 This repo shows how you can create and manage polls through W3bber smart contracts and backend APIs. Key features include:
@@ -80,6 +82,100 @@ Similarly, you can do `yarn test`, `yarn build` and `yarn eject`
 2. Poll creator calls the w3bber backend api to decrypt the votes by supplying the poll_id and secret_key
 3. Once the results are obtained, the poll creator can transfer the reward tokens to the respective wallets
 
+## Integration
+If you want to integrate in your own application these are the relevant code sections:
+
+### Interacting with Smart contract:
+```typescript
+// Path: src/api/solana_api.ts
+// https://solana.fm/address/Dvufj2n9dYtimtH8su9ZNHoJ33Yd9a49KAtn5PoJGh2c?cluster=devnet-solana
+
+// Creating Poll on Solana blockchain
+export async function createPollOnChain(
+  program: Program,
+  wallet: AnchorWallet,
+  pollKeypair: anchor.web3.Keypair,
+  pollModel: PollModel
+) {
+  if (program === undefined || wallet === undefined) {
+    return undefined;
+  }
+  return await program.methods
+    .createPoll(pollKeypair.publicKey, 0, pollModel.max_options)
+    .accounts({
+      pollAccount: pollKeypair.publicKey,
+      user: wallet.publicKey,
+    })
+    .signers([pollKeypair])
+    .rpc();
+}
+
+// Creating Vote on Solana blockchain
+export async function createVoteOnChain(
+  program: Program,
+  wallet: AnchorWallet,
+  pollPublicKey: PublicKey,
+  voteCipher: string,
+  solStaked: number
+) {
+  if (program === undefined || wallet === undefined) {
+    return undefined;
+  }
+  const [individualVotePDA, bumpVote] = PublicKey.findProgramAddressSync(
+    [pollPublicKey.toBuffer(), wallet.publicKey.toBuffer()],
+    program.programId
+  );
+
+  const lamportsToStake = new anchor.BN(solStaked * LAMPORTS_PER_SOL);
+
+  // Create Vote
+  return await program.methods
+    .createVote(voteCipher, lamportsToStake)
+    .accounts({
+      pollAccount: pollPublicKey,
+      voteAccount: individualVotePDA,
+      user: wallet.publicKey,
+    })
+    .signers([])
+    .rpc();
+}
+```
+### Interacting with W3bber Backend
+```typescript
+// Path: src/api/api.ts
+// https://consensusbackend.w3bber.com/docs
+
+// Creating Poll on W3bber Backend
+export const createPoll = async (bearerToken: string, pollModel: PollModel) => {
+  const api_call: string = `${BASEURL}/consensus-polls/create_poll`;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${bearerToken}`,
+      accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  };
+
+  console.log(qs.stringify(pollModel));
+  return axios.post<PollModel>(api_call, pollModel, config);
+};
+
+// Creating Vote on W3bber Backend
+export const createVote = async (bearerToken: string, voteModel: VoteModel) => {
+  const api_call: string = `${BASEURL}/consensus-polls/create_vote`;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${bearerToken}`,
+      accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  };
+
+  console.log(qs.stringify(voteModel));
+  return axios.post<VoteModel>(api_call, voteModel, config);
+};
+```
+
 ## Reward Calculation
 Consider a poll that took place with 10 options and `Reward Calculation Type` as `Singular`. Also, suppose the rewards distribution was kept as:\
 70% for First Place\
@@ -118,3 +214,7 @@ Option 2 -  43.8 / 36 = 1.216 SOL for 1 SOL staked\
 Option 7 - 21.9 / 28 = 0.782 SOL for 1 SOL staked
 
 **Note that this is a Zero Sum Game, where the rewards for winning voters are funded by the losing Options’ voters, and the payouts depend on both the reward function and the calculation method used**
+
+## Important Links
+### <a href="https://consensusbackend.w3bber.com/docs" target="_blank">W3bber Backend Docs</a>
+### <a href="https://solana.fm/address/Dvufj2n9dYtimtH8su9ZNHoJ33Yd9a49KAtn5PoJGh2c?cluster=devnet-solana" target="_blank">On-Chain Smart Contract (Devnet)</a>
